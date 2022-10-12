@@ -1,0 +1,95 @@
+GRAPHQL:
+
+Query: en un crud, nos permite leer los registros. Es la forma de extraer información de la base de datos o REST API y es el equivalente a un SELECT de SQL o un GET de API REST.
+
+--> En el query declaras que campos o datos vas a requerir para tu consulta y el nombre que le vas a dar a la consulta.
+
+Ej:
+query {
+    obtenerProductos{
+        id
+        nombre
+        precio
+        stock
+    }
+}
+
+-------------------------------------------------------------------------------------
+
+Mutation: en un crud, nos permite crear, actualizar o eliminar registros. Es la forma de modificar la información de la base de datos o REST API y es el equivalente a un INSERT, UPDATE o DELETE de SQL o un POST, PUT o DELETE de API REST.
+
+Ej:
+mutation eliminarProducto($id: ID!){
+    eliminarProducto(id: $id)
+}
+{
+    "data": {
+        "eliminarProducto": "Producto eliminado"
+    }
+}
+
+-------------------------------------------------------------------------------------
+
+SCHEMA: Es la forma en la que GraphQL va a definir la estructura de los datos que vamos a utilizar en nuestra aplicación. Es decir, es la forma en la que vamos a definir los tipos de datos que vamos a utilizar en nuestra aplicación. Por ejemplo, si vamos a utilizar un producto, vamos a definir el tipo de dato producto y los campos que va a tener. Esto es muy importante porque GraphQL va a utilizar esta definición para saber que datos va a recibir y que datos va a devolver. 
+
+Ej:
+type Cliente {
+    id: ID
+    nombre: String
+    apellido: String
+    empresa: String
+    email: [Email] # Un cliente puede tener varios emails, los corchetes indican que es un array
+    telefono: String
+}
+
+type Email {
+    email: String
+}
+
+-------------------------------------------------------------------------------------
+
+RESOLVERS: Es la función que se ejecuta cuando se ejecuta una consulta o una mutación. Es decir, es la función que se ejecuta cuando se ejecuta una consulta o una mutación. Por ejemplo, si tenemos una consulta que se llama obtenerClientes, vamos a definir un resolver que se llame obtenerClientes y que se encargue de ejecutar la consulta a la base de datos y devolver los datos.
+
+Ej:
+    obtenerClientes: async () => {
+        try {
+            const clientes = await Cliente.find({});
+            return clientes;
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+
+
+-------------------------------------------------------------------------------------
+SCHEMA Y RESOLVERS EN UNO:
+--En el schame de graphql--
+
+type Query{
+    obtenerCliente(id: ID): Cliente  ##(anotacion)
+}
+
+## type Cliente{
+    id: ID
+    nombre: String
+    apellido: String
+    empresa: String
+    email: [Email]
+    telefono: String
+}
+
+
+--En resolvers--
+
+
+obtenerCliente: async (_, {id}) => {
+        //Revisar si el cliente existe o no
+        const cliente = await Cliente.findById(id);
+
+        if(!cliente) {
+            throw new Error('Cliente no encontrado');
+        }
+
+        return cliente;
+    },
